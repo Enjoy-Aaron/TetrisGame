@@ -10,13 +10,13 @@
 // ============================================================
 // 布局与尺寸
 // ============================================================
-static constexpr int BOARD_W = 10;   // 棋盘列数
+static constexpr int BOARD_W = 16;   // 棋盘列数
 static constexpr int BOARD_H = 20;   // 棋盘行数
 static constexpr int CELL = 30;      // 每格像素
 static constexpr int BOARD_X = 25;
 static constexpr int BOARD_Y = 25;
-static constexpr int PANEL_X = 345;  // 右侧信息栏起点
-static constexpr int WIN_W = 570;
+static constexpr int PANEL_X = 550;  // 右侧信息栏起点
+static constexpr int WIN_W = 800;
 static constexpr int WIN_H = 650;
 
 static constexpr int RANK_SIZE = 5;
@@ -245,17 +245,24 @@ public:
         return rows;
     }
 
-    // 按行号从大到小删除，保证多行同时消除正确
+    // 标记满行，从下往上只把非满行压下来，空行补到顶部
+    // 这样连续多行同时消除时，不会把另一行满块"挤"下来后漏掉
     void removeRows(const std::vector<int>& rows)
     {
-        for (int k = (int)rows.size() - 1; k >= 0; --k)
+        std::vector<bool> full(BOARD_H, false);
+        for (int r : rows) full[r] = true;
+
+        int write = BOARD_H - 1;
+        for (int y = BOARD_H - 1; y >= 0; --y)
         {
-            int r = rows[k];
-            for (int y = r; y > 0; --y)
-                for (int x = 0; x < BOARD_W; ++x)
-                    cell[y][x] = cell[y - 1][x];
-            for (int x = 0; x < BOARD_W; ++x) cell[0][x] = -1;
+            if (full[y]) continue;
+            for (int x = 0; x < BOARD_W; ++x)
+                cell[write][x] = cell[y][x];
+            --write;
         }
+        for (; write >= 0; --write)
+            for (int x = 0; x < BOARD_W; ++x)
+                cell[write][x] = -1;
     }
 };
 
@@ -633,7 +640,7 @@ public:
         const char* items[3] = {"开始游戏", "排行榜", "退出游戏"};
         for (int i = 0; i < 3; ++i)
         {
-            Rectangle b = Rectangle{155, 260 + i * 70.0f, 260, 56};
+            Rectangle b = Rectangle{(WIN_W - 260) / 2.0f, 260 + i * 70.0f, 260, 56};
             menuBounds[i] = b;
             bool on = i == menuSel;
             if (on)
@@ -651,7 +658,7 @@ public:
         TextCenter(fontBig, "选择难度", WIN_W / 2.0f, 80, 46, kGold);
         for (int i = 0; i < 3; ++i)
         {
-            Rectangle b = Rectangle{95, 200 + i * 100.0f, 380, 78};
+            Rectangle b = Rectangle{(WIN_W - 380) / 2.0f, 200 + i * 100.0f, 380, 78};
             diffBounds[i] = b;
             bool on = i == diffSel;
             if (on)
