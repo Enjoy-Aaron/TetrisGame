@@ -340,11 +340,11 @@ static int qHead = 0;                // 队头下标
 static int qTail = 0;               // 队尾下标
 static int qCount = 0;             // 当前元素个数
 
-// 清空队列并预填两个随机块（一个当前块、一个下一个块）
+// 清空队列并预填三个随机块（接下来要依次出现的 3 个方块）
 static void qInit()
 {
     qHead = qTail = qCount = 0;
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 3; ++i)
     {
         pieceQueue[qTail] = {GetRandomValue(0, 6), GetRandomValue(0, 3)};
         qTail = (qTail + 1) % Q_CAP;
@@ -844,23 +844,24 @@ static void drawPanel()
 
     DrawTextEx(fontUI, "下一个", Vector2{x, 18}, 22, 1.0f, kText);
 
-    Rectangle pv = Rectangle{x + 5, 48, 190, 100};
+    // 预览框加高到能竖排显示 3 个方块
+    Rectangle pv = Rectangle{x + 5, 48, 190, 195};
     DrawRectangleRounded(pv, 0.08f, 8, Color{26, 26, 36, 255});
     DrawRectangleRoundedLinesEx(pv, 0.08f, 8, 2.0f, Color{52, 52, 70, 255});
     drawNext(pv);
 
-    statBlock(x, 165, "当前分数", score);
-    statBlock(x, 245, "最高纪录", high);
-    statBlock(x, 325, "当前等级", level);
-    statBlock(x, 405, "消除行数", totalLines);
+    statBlock(x, 260, "当前分数", score);
+    statBlock(x, 325, "最高纪录", high);
+    statBlock(x, 390, "当前等级", level);
+    statBlock(x, 455, "消除行数", totalLines);
 
     const char* help[] = {"← → 移动", "↓ 加速", "↑/空格 旋转",
                           "P 暂停", "R 重开", "Esc 菜单"};
     for (int i = 0; i < 6; ++i)
-        DrawTextEx(fontUI, help[i], Vector2{x, 475.0f + i * 23.0f}, 17, 1.0f, kTextDim);
+        DrawTextEx(fontUI, help[i], Vector2{x, 505.0f + i * 20.0f}, 17, 1.0f, kTextDim);
 
     std::string d = "难度：" + std::string(kDiff[diffIdx].name);
-    DrawTextEx(fontUI, d.c_str(), Vector2{x, 618}, 19, 1.0f, kGold);
+    DrawTextEx(fontUI, d.c_str(), Vector2{x, 625}, 19, 1.0f, kGold);
 }
 
 // 画一个"标签 + 数值"的小块（分数、等级等）
@@ -871,30 +872,40 @@ static void statBlock(float x, int y, const char* label, int value)
                Vector2{x, (float)y + 24}, 26, 1.0f, kText);
 }
 
-// 在预览框 pv 里画队头那个方块（即下一个方块），自动居中
+// 在预览框 pv 里竖排画队列前 3 个方块（接下来要依次出现的 3 个）
 static void drawNext(Rectangle pv)
 {
-    PiecePair next = qFront();
-    int minR = 4, maxR = -1, minC = 4, maxC = -1;
-    for (int i = 0; i < 4; ++i)
-        for (int j = 0; j < 4; ++j)
-            if (g_piece[next.shape][next.form][i][j] == 1)
-            {
-                minR = std::min(minR, i);
-                maxR = std::max(maxR, i);
-                minC = std::min(minC, j);
-                maxC = std::max(maxC, j);
-            }
-    const int gs = 22;
-    float w = (maxC - minC + 1) * gs;
-    float h = (maxR - minR + 1) * gs;
-    float ox = pv.x + (pv.width - w) / 2;
-    float oy = pv.y + (pv.height - h) / 2;
-    for (int i = minR; i <= maxR; ++i)
-        for (int j = minC; j <= maxC; ++j)
-            if (g_piece[next.shape][next.form][i][j] == 1)
-                DrawCell((int)(ox + (j - minC) * gs),
-                         (int)(oy + (i - minR) * gs), gs, kShapeColor[next.shape]);
+    const int gs = 18;                    // 每个小格像素
+    float slotH = pv.height / 3.0f;       // 3 个方块平分高度
+    for (int k = 0; k < 3; ++k)
+    {
+        // 从队头开始依次取 3 个（环形队列下标取模）
+        int idx = (qHead + k) % Q_CAP;
+        int sh = pieceQueue[idx].shape;
+        int fm = pieceQueue[idx].form;
+
+        // 算出这个方块的实际包围盒
+        int minR = 4, maxR = -1, minC = 4, maxC = -1;
+        for (int i = 0; i < 4; ++i)
+            for (int j = 0; j < 4; ++j)
+                if (g_piece[sh][fm][i][j] == 1)
+                {
+                    minR = std::min(minR, i);
+                    maxR = std::max(maxR, i);
+                    minC = std::min(minC, j);
+                    maxC = std::max(maxC, j);
+                }
+        float w = (maxC - minC + 1) * gs;
+        float h = (maxR - minR + 1) * gs;
+        // 水平居中、垂直落在自己的槽位里
+        float ox = pv.x + (pv.width - w) / 2;
+        float oy = pv.y + k * slotH + (slotH - h) / 2;
+        for (int i = minR; i <= maxR; ++i)
+            for (int j = minC; j <= maxC; ++j)
+                if (g_piece[sh][fm][i][j] == 1)
+                    DrawCell((int)(ox + (j - minC) * gs),
+                             (int)(oy + (i - minR) * gs), gs, kShapeColor[sh]);
+    }
 }
 
 // 暂停遮罩
