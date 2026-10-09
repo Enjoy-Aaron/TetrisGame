@@ -10,43 +10,43 @@
 // ============================================================
 // 一、布局与尺寸常量
 // ============================================================
-static constexpr int BOARD_W = 16;    // 棋盘列数
-static constexpr int BOARD_H = 20;    // 棋盘行数
-static constexpr int CELL = 30;       // 每格像素大小
-static constexpr int BOARD_X = 25;   // 棋盘左上角 x
-static constexpr int BOARD_Y = 25;  // 棋盘左上角 y
-static constexpr int PANEL_X = 550; // 右侧信息栏起点 x
-static constexpr int WIN_W = 800;   // 窗口宽
-static constexpr int WIN_H = 650;  // 窗口高
+static constexpr int BOARD_W = 16;      // 棋盘列数
+static constexpr int BOARD_H = 20;      // 棋盘行数
+static constexpr int CELL = 30;         // 每格像素大小
+static constexpr int BOARD_X = 25;      // 棋盘左上角 x
+static constexpr int BOARD_Y = 25;      // 棋盘左上角 y
+static constexpr int PANEL_X = 550;     // 右侧信息栏起点 x
+static constexpr int WIN_W = 800;       // 窗口宽
+static constexpr int WIN_H = 650;       // 窗口高
 
-static constexpr int RANK_SIZE = 5;             // 排行榜显示几条
+static constexpr int RANK_SIZE = 5;     // 排行榜显示几条
 static constexpr const char* SCORE_FILE = "high_score.txt";  // 最高分文件
 static constexpr const char* RANK_FILE = "leaderboard.txt";  // 排行榜文件
 
 // ============================================================
 // 二、颜色（RGBA）
 // ============================================================
-static const Color kBg       = {18, 18, 24, 255};
-static const Color kBoardBg  = {11, 11, 16, 255};
-static const Color kGrid     = {30, 30, 40, 255};
-static const Color kText     = {226, 226, 232, 255};
-static const Color kTextDim  = {128, 128, 144, 255};
-static const Color kGold     = {240, 200, 70, 255};
-static const Color kSelect   = {52, 84, 158, 255};
+static const Color kBg       = {18, 18, 24, 255};       //很深的蓝灰色，整个窗口的底色
+static const Color kBoardBg  = {11, 11, 16, 255};       //比底色更暗的近黑色，棋盘内部的背景
+static const Color kGrid     = {30, 30, 40, 255};       //很暗的灰蓝，棋盘上画格子用的细线
+static const Color kText     = {226, 226, 232, 255};    //接近纯白的亮灰，主要正文和数字
+static const Color kTextDim  = {128, 128, 144, 255};    //中灰色，次要提示/说明文字
+static const Color kGold     = {240, 200, 70, 255};     //金黄色，强调色
+static const Color kSelect   = {52, 84, 158, 255};      //中等蓝色，菜单按钮被选中时的高亮底色
 
 // 形状编号：0=T 1=J 2=L 3=S 4=Z 5=O 6=I，下标直接对应颜色
 static const Color kShapeColor[7] = {
-    {176, 80, 225, 255},   // T
-    {52, 92, 232, 255},    // J
-    {238, 142, 38, 255},   // L
-    {60, 185, 80, 255},    // S
-    {228, 68, 72, 255},    // Z
-    {232, 205, 55, 255},   // O
-    {45, 198, 218, 255}    // I
+    {176, 80, 225, 255},   // T型 紫色
+    {52, 92, 232, 255},    // J型 蓝色
+    {238, 142, 38, 255},   // L型 橙色
+    {60, 185, 80, 255},    // S型 绿色
+    {228, 68, 72, 255},    // Z型 红色
+    {232, 205, 55, 255},   // O型 黄色
+    {45, 198, 218, 255}    // I型 青色
 };
 
 // 把颜色按倍数调亮/调暗（用于方块的高光和暗边）
-static Color Shade(Color c, float f)
+static Color Shade(Color c, float f)    // f>1.0 调亮，f<1.0 调暗
 {
     return Color{
         (unsigned char)std::clamp((int)(c.r * f), 0, 255),
@@ -58,20 +58,20 @@ static Color Shade(Color c, float f)
 // 画一个带立体高光的小方块
 static void DrawCell(int x, int y, int sz, Color c)
 {
-    DrawRectangle(x, y, sz, sz, c);
-    int b = sz >= 25 ? 3 : 2;
-    DrawRectangle(x + 1, y + 1, sz - 2, b, Shade(c, 1.35f));           // 顶部高光
+    DrawRectangle(x, y, sz, sz, c);     // 方块主体
+    int b = sz >= 25 ? 3 : 2;           // 高光和暗边的宽度
+    DrawRectangle(x + 1, y + 1, sz - 2, b, Shade(c, 1.35f));            // 顶部高光
     DrawRectangle(x + 1, y + 1, b, sz - 2, Shade(c, 1.35f));            // 左侧高光
-    DrawRectangle(x + 1, y + sz - 1 - b, sz - 2, b, Shade(c, 0.55f));  // 底部暗边
-    DrawRectangle(x + sz - 1 - b, y + 1, b, sz - 2, Shade(c, 0.55f));  // 右侧暗边
+    DrawRectangle(x + 1, y + sz - 1 - b, sz - 2, b, Shade(c, 0.55f));   // 底部暗边
+    DrawRectangle(x + sz - 1 - b, y + 1, b, sz - 2, Shade(c, 0.55f));   // 右侧暗边
 }
 
 // 画落点影子（半透明填充 + 描边）
 static void DrawGhostCell(int x, int y, int sz, Color c)
 {
-    DrawRectangle(x + 1, y + 1, sz - 2, sz - 2, Color{c.r, c.g, c.b, 40});
-    DrawRectangleLinesEx(Rectangle{x + 1.0f, y + 1.0f, sz - 2.0f, sz - 2.0f},
-                         1.5f, Color{c.r, c.g, c.b, 150});
+    DrawRectangle(x + 1, y + 1, sz - 2, sz - 2, Color{c.r, c.g, c.b, 40});      // 半透明填充  
+    DrawRectangleLinesEx(Rectangle{x + 1.0f, y + 1.0f, sz - 2.0f, sz - 2.0f},   
+                         1.5f, Color{c.r, c.g, c.b, 150});                      // 半透明描边
 }
 
 // ============================================================

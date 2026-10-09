@@ -8,7 +8,7 @@
 *.out
 *.o
 *.obj
-# *.a
+*.a
 # *.lib
 # *.dll
 *.pdb
