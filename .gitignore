@@ -8,9 +8,9 @@
 *.out
 *.o
 *.obj
-*.a
-*.lib
-*.dll
+# *.a
+# *.lib
+# *.dll
 *.pdb
 *.ilk
 
@@ -20,6 +20,9 @@ Debug/
 Release/
 x64/
 cmake-build-*/
+
+# ========== 第三方库 ==========
+
 
 # ========== 游戏运行数据 ==========
 leaderboard.txt
