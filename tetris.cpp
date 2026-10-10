@@ -98,11 +98,11 @@ static const char* kUiTexts[] = {
 static std::vector<int> CollectCodePoints()
 {
     std::set<int> s;
-    for (int c = 32; c <= 126; ++c) s.insert(c);
+    for (int c = 32; c <= 126; ++c) s.insert(c);    // 塞入 ASCII 可打印字符
     static const int extra[] = {
-        0x2190, 0x2191, 0x2192, 0x2193,   // ← ↑ → ↓
-        0xFF0C, 0xFF1A,                    // ， ：
-        0x2014};                           // —
+        0x2190, 0x2191, 0x2192, 0x2193,     // ← ↑ → ↓
+        0xFF0C, 0xFF1A,                     // ， ：
+        0x2014};                            // —
     for (int c : extra) s.insert(c);
 
     // 手动按 UTF-8 规则解析每个汉字的码点
@@ -112,18 +112,18 @@ static std::vector<int> CollectCodePoints()
         while (*p)
         {
             int cp = 0;
-            if (*p < 0x80) { cp = *p; ++p; }
-            else if ((*p & 0xE0) == 0xC0)
+            if (*p < 0x80) { cp = *p; ++p; }    // ASCII 字符
+            else if ((*p & 0xE0) == 0xC0)       // 2 字节汉字
             {
                 cp = ((p[0] & 0x1F) << 6) | (p[1] & 0x3F);
                 p += 2;
             }
-            else if ((*p & 0xF0) == 0xE0)
+            else if ((*p & 0xF0) == 0xE0)       // 3 字节汉字
             {
                 cp = ((p[0] & 0x0F) << 12) | ((p[1] & 0x3F) << 6) | (p[2] & 0x3F);
                 p += 3;
             }
-            else if ((*p & 0xF8) == 0xF0)
+            else if ((*p & 0xF8) == 0xF0)       // 4 字节汉字（极少用到）
             {
                 cp = ((p[0] & 0x07) << 18) | ((p[1] & 0x3F) << 12) |
                      ((p[2] & 0x3F) << 6) | (p[3] & 0x3F);
