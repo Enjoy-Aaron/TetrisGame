@@ -34,13 +34,13 @@ static const Color kTextDim  = {128, 128, 144, 255};    //中灰色，次要提�
 static const Color kGold     = {240, 200, 70, 255};     //金黄色，强调色
 static const Color kSelect   = {52, 84, 158, 255};      //中等蓝色，菜单按钮被选中时的高亮底色
 
-// 形状编号：0=T 1=J 2=L 3=S 4=Z 5=O 6=I，下标直接对应颜色
+// 形状编号：0=T 1=J 2=L 3=Z 4=S 5=O 6=I，下标直接对应颜色
 static const Color kShapeColor[7] = {
     {176, 80, 225, 255},   // T型 紫色
     {52, 92, 232, 255},    // J型 蓝色
     {238, 142, 38, 255},   // L型 橙色
-    {60, 185, 80, 255},    // S型 绿色
-    {228, 68, 72, 255},    // Z型 红色
+    {60, 185, 80, 255},    // Z型 绿色
+    {228, 68, 72, 255},    // S型 红色
     {232, 205, 55, 255},   // O型 黄色
     {45, 198, 218, 255}    // I型 青色
 };
@@ -139,15 +139,15 @@ static std::vector<int> CollectCodePoints()
 static Font fontUI;   // 普通字号字体
 static Font fontBig;  // 大标题字体
 
-// 水平居中绘制一段文字，cx 是中心点 x
+// 水平居中绘制一段文字，cx 是中心点 x 坐标
 static void TextCenter(Font f, const char* text, float cx, float y, float size, Color c)
 {
-    Vector2 m = MeasureTextEx(f, text, size, 1.0f);
-    DrawTextEx(f, text, Vector2{cx - m.x / 2, y}, size, 1.0f, c);
+    Vector2 m = MeasureTextEx(f, text, size, 1.0f);                 // 计算文字宽高
+    DrawTextEx(f, text, Vector2{cx - m.x / 2, y}, size, 1.0f, c);   // 以 cx 为中心点绘制
 }
 
 // ============================================================
-// 四、方块形状表（三维数组 piece[7][4][4]）
+// 四、方块形状表（四维数组 piece[7][4][4][4]）
 //    piece[形状编号][旋转形态][行][列] = 1 表示该格有方块
 // ============================================================
 static int g_piece[7][4][4][4];
@@ -174,7 +174,7 @@ static void InitPieces()
     g_piece[1][0][3][2] = 1;
     g_piece[2][0][3][1] = 1;
 
-    // S、Z、O 形
+    // Z、S、O 形
     for (int i = 0; i <= 1; ++i)
     {
         g_piece[3][0][1][i] = 1;
