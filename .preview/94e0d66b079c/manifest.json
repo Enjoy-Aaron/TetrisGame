@@ -1,0 +1,64 @@
+{
+  "schema_version": "1",
+  "source_path": "C:\\Users\\86151\\AppData\\Local\\Doubao\\User Data\\Default\\.doubao\\agent_mode\\workspace\\.sessions\\38446480076164098\\agents\\m_0cwRiw5PwZO\\work\\personal2\\chen_out.pdf",
+  "source_filename": "chen_out.pdf",
+  "source_hash": "94e0d66b079c",
+  "source_size_bytes": 708449,
+  "kind": "pdf",
+  "rendered_at_utc": "2026-10-14T05:09:40+00:00",
+  "output_dir": "C:\\AAMyDocuments\\programming\\C++\\AAprojects\\tetrisGame\\.preview\\94e0d66b079c",
+  "page_count": 22,
+  "rendered_page_count": 4,
+  "collage_count": 0,
+  "extracted_text_chars": 6085,
+  "text_relpath": "text.md",
+  "thumbnail_relpath": null,
+  "pages": [
+    {
+      "page": 18,
+      "relpath": "pages\\p018.png",
+      "size_bytes": 172529,
+      "width": 1241,
+      "height": 1754
+    },
+    {
+      "page": 19,
+      "relpath": "pages\\p019.png",
+      "size_bytes": 174960,
+      "width": 1241,
+      "height": 1754
+    },
+    {
+      "page": 20,
+      "relpath": "pages\\p020.png",
+      "size_bytes": 155822,
+      "width": 1241,
+      "height": 1754
+    },
+    {
+      "page": 21,
+      "relpath": "pages\\p021.png",
+      "size_bytes": 203327,
+      "width": 1241,
+      "height": 1754
+    }
+  ],
+  "collages": [],
+  "warnings": [
+    "Pillow unavailable for thumbnail",
+    "Pillow unavailable: No module named 'PIL'"
+  ],
+  "options": {
+    "max_pages": 12,
+    "collage": true,
+    "page_range": "18-21",
+    "thumbnail": true,
+    "text_only": false,
+    "jpeg_quality": 85,
+    "out_max_dim": 2048
+  },
+  "summary": {
+    "total_pages": 22,
+    "rendered_pages": 4
+  }
+}
